@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Iberia"
+             targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia"
+             xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:client="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia"
+             xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	TYPE DEFINITION - List of services participating in this BPEL process
+	The default output of the BPEL designer uses strings as input and 
+	output to the BPEL Process. But you can define or import any XML 
+	Schema type and use them as part of the message types.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->   
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia" schemaLocation="../Schemas/Iberia.xsd" />
+		</schema>
+	</wsdl:types>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	MESSAGE TYPE DEFINITION - Definition of the message types used as 
+	part of the port type defintions
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->      
+	<wsdl:message name="IberiaRequestMessage">
+		<wsdl:part name="payload" element="client:IberiaRequestMessage"/>
+	</wsdl:message>
+	<wsdl:message name="IberiaResponseMessage">
+		<wsdl:part name="payload" element="client:IberiaResponseMessage"/>
+	</wsdl:message>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PORT TYPE DEFINITION - A port type groups a set of operations into
+	a logical service unit.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<!-- portType implemented by the Iberia BPEL process -->
+	<wsdl:portType name="Iberia">
+		<wsdl:operation name="process">
+			<wsdl:input  message="client:IberiaRequestMessage" />
+			<wsdl:output message="client:IberiaResponseMessage"/>
+   <wsdl:fault name="fault" message="client:IberiaFaultMessage"/>
+  </wsdl:operation>
+	</wsdl:portType>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PARTNER LINK TYPE DEFINITION
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+	<plnk:partnerLinkType name="Iberia">
+		<plnk:role name="IberiaProvider" portType="client:Iberia"/>
+	</plnk:partnerLinkType>
+ <wsdl:binding name="IberiaSOAP11Binding" type="client:Iberia">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="process">
+   <soap:operation style="document"
+                   soapAction="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia/process"/>
+   <wsdl:input>
+    <soap:body use="literal" parts="payload"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal" parts="payload"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="Iberia">
+  <wsdl:port name="IberiaPort" binding="client:IberiaSOAP11Binding">
+   <soap:address location="http://host.docker.internal:7101/soa-infra/services/default/P1_FlightProject/iberia_client_ep"/>
+  </wsdl:port>
+ </wsdl:service>
+ <wsdl:message name="IberiaFaultMessage">
+  <wsdl:part name="IberiaFaultMessage" element="client:FechasErroneasFaultMessage"/>
+ </wsdl:message>
+</wsdl:definitions>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/P2_ComprasService/P2_ComprasService/Comprador"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="CompradorRequest">
+		<complexType>
+			<sequence>
+				<element name="Nombre" type="string"/>
+    <element name="PrecioOriginal" type="double"/>
+    <element name="Precio" type="double"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="CompradorResponse">
+		<complexType>
+			<sequence>
+				<element name="Acepta" type="string"/>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

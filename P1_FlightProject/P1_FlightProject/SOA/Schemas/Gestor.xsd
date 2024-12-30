@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Gestor"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="GestorRequestMessage">
+		<complexType>
+			<sequence>
+				<element name="Name" type="string"/>
+    <element name="Origen" type="string"/>
+    <element name="Destino" type="string"/>
+    <element name="Salida" type="dateTime"/>
+    <element name="Llegada" type="dateTime"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="GestorRespondMessage">
+		<complexType>
+			<sequence>
+				<element name="Aerolinea" type="string"/>
+    <element name="Precio" type="double"/>
+   </sequence>
+		</complexType>
+	</element>
+</schema>

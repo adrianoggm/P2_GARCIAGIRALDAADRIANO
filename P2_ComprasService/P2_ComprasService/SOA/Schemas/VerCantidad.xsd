@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/P2_ComprasService/P2_ComprasService/VerCantidad"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="VerCantidadRequest">
+		<complexType>
+			<sequence>
+				<element name="Producto" type="string"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="VerCantidadResponse">
+		<complexType>
+			<sequence>
+				<element name="mensaje" type="string"/>
+    <element name="Producto" type="string"/>
+    <element name="HayStock" type="int"/>
+    <element name="Stock" type="string"/>
+   </sequence>
+		</complexType>
+	</element>
+</schema>

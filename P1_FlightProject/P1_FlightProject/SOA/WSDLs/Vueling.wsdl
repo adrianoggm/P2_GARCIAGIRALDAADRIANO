@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Vueling"
+             targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling"
+             xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:client="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling"
+             xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	TYPE DEFINITION - List of services participating in this BPEL process
+	The default output of the BPEL designer uses strings as input and 
+	output to the BPEL Process. But you can define or import any XML 
+	Schema type and use them as part of the message types.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->   
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling" schemaLocation="../Schemas/Vueling.xsd" />
+		</schema>
+	</wsdl:types>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	MESSAGE TYPE DEFINITION - Definition of the message types used as 
+	part of the port type defintions
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->      
+	<wsdl:message name="VuelingRequestMessage">
+		<wsdl:part name="payload" element="client:VuelingRequestMessage"/>
+	</wsdl:message>
+	<wsdl:message name="VuelingResponseMessage">
+		<wsdl:part name="payload" element="client:VuelingResponseMessage"/>
+	</wsdl:message>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PORT TYPE DEFINITION - A port type groups a set of operations into
+	a logical service unit.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<!-- portType implemented by the Vueling BPEL process -->
+	<wsdl:portType name="Vueling">
+		<wsdl:operation name="process">
+			<wsdl:input  message="client:VuelingRequestMessage" />
+			<wsdl:output message="client:VuelingResponseMessage"/>
+   <wsdl:fault name="fault" message="client:VuelingFaultMessage"/>
+  </wsdl:operation>
+	</wsdl:portType>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PARTNER LINK TYPE DEFINITION
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
+	<plnk:partnerLinkType name="Vueling">
+		<plnk:role name="VuelingProvider" portType="client:Vueling"/>
+	</plnk:partnerLinkType>
+ <wsdl:binding name="VuelingSOAP11Binding" type="client:Vueling">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="process">
+   <soap:operation style="document"
+                   soapAction="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling/process"/>
+   <wsdl:input>
+    <soap:body use="literal" parts="payload"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal" parts="payload"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="Vueling">
+  <wsdl:port name="VuelingPort" binding="client:VuelingSOAP11Binding">
+   <soap:address location="http://host.docker.internal:7101/soa-infra/services/default/P1_FlightProject/vueling_client_ep"/>
+  </wsdl:port>
+ </wsdl:service>
+ <wsdl:message name="VuelingFaultMessage">
+  <wsdl:part name="VuelingFaultMessage" element="client:FechasErroneasFaultMessage"/>
+ </wsdl:message>
+</wsdl:definitions>

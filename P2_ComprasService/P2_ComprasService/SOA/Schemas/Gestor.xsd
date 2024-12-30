@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/P2_ComprasService/P2_ComprasService/Gestor"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="GestorRequest">
+		<complexType>
+			<sequence>
+				<element name="Producto" type="string"/>
+    <element name="PrecioOriginal" type="double"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="GestorResponse">
+		<complexType>
+			<sequence>
+				<element name="mensaje" type="string"/>
+    <element name="Precio" type="double"/>
+   </sequence>
+		</complexType>
+	</element>
+</schema>

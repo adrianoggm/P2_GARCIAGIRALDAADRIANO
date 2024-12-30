@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+<element name="IberiaRequestMessage">
+		<complexType>
+			<sequence>
+    <element name="Origen" type="string"/>
+    <element name="Destino" type="string"/>
+    <element name="Inicio" type="dateTime"/>
+    <element name="Fin" type="dateTime"/>
+    <element name="TipoBillete" type="string"/>
+   </sequence>
+		</complexType>
+	</element>
+	<element name="IberiaResponseMessage">
+		<complexType>
+			<sequence>
+				<element name="Precio" type="double"/>
+			</sequence>
+		</complexType>
+	</element>
+ <element name="FechasErroneasFaultMessage">
+  <complexType>
+   <sequence>
+    <element name="Mensaje" type="string"/>
+   </sequence>
+  </complexType>
+ </element>
+</schema>

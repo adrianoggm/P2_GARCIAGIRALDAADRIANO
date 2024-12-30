@@ -1,0 +1,143 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Tue Nov 12 14:24:43 CET 2024
+  Author:  adria
+  Type: BPEL 2.0 Process
+  Purpose: Synchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="Vueling"
+               targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+
+    <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling" location="../WSDLs/Vueling.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PARTNERLINKS                                                      
+        List of services participating in this BPEL process               
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="vueling_client" partnerLinkType="client:Vueling" myRole="VuelingProvider"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:VuelingRequestMessage"/>
+
+    <!-- Reference to the message that will be returned to the requester-->
+    <variable name="outputVariable" messageType="client:VuelingResponseMessage"/>
+  </variables>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in Vueling.wsdl) -->
+    <receive name="receiveInput" partnerLink="vueling_client" portType="client:Vueling" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="InitPrecioa4">
+      <copy>
+        <from>4</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+      </copy>
+    </assign>
+    <if name="If1">
+      <condition>$inputVariable.payload/client:Inicio&lt;$inputVariable.payload/client:Fin</condition>
+      <sequence name="Sequence1">
+        <if name="If2">
+          <condition>$inputVariable.payload/client:TipoBillete='PrimeraClase'</condition>
+          <assign name="PrimeraClasex25">
+            <copy>
+              <from>$outputVariable.payload/client:Precio*25</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+            </copy>
+          </assign>
+          <elseif>
+            <condition>$inputVariable.payload/client:TipoBillete='JetPrivado'</condition>
+            <assign name="JetPrivadox200">
+              <copy>
+                <from>$outputVariable.payload/client:Precio*200</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+              </copy>
+            </assign>
+          </elseif>
+          <else>
+            <assign name="Turistax8">
+              <copy>
+                <from>$outputVariable.payload/client:Precio*8</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+              </copy>
+            </assign>
+          </else>
+        </if>
+        <if name="If3">
+          <condition>$inputVariable.payload/client:Origen='AMS'</condition>
+          <assign name="AMSX20">
+            <copy>
+              <from>$outputVariable.payload/client:Precio*20</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+            </copy>
+          </assign>
+          <elseif>
+            <condition>$inputVariable.payload/client:Origen='FCO'</condition>
+            <assign name="FCOX30">
+              <copy>
+                <from>$outputVariable.payload/client:Precio*30</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+              </copy>
+            </assign>
+          </elseif>
+          <else>
+            <assign name="X5">
+              <copy>
+                <from>$outputVariable.payload/client:Precio*5</from>
+                <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+              </copy>
+            </assign>
+          </else>
+        </if>
+      </sequence>
+      <else>
+        <sequence name="Sequence2">
+          <throw name="Throw1" faultName="client:fault"/>
+        </sequence>
+      </else>
+    </if>
+    <!-- Generate reply to synchronous request -->
+    <reply name="replyOutput" partnerLink="vueling_client" portType="client:Vueling" operation="process" variable="outputVariable"/>
+  </sequence>
+</process>

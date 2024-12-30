@@ -1,0 +1,182 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Tue Nov 12 13:39:14 CET 2024
+  Author:  adria
+  Type: BPEL 2.0 Process
+  Purpose: Synchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="Gestor"
+               targetNamespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Gestor"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Gestor"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap"
+         xmlns:ns1="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Empleado"
+         xmlns:ns2="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Iberia"
+         xmlns:ns3="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Vueling">
+
+    <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/P1_FlightProject/P1_FlightProject/Gestor" location="../WSDLs/Gestor.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PARTNERLINKS                                                      
+        List of services participating in this BPEL process               
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="gestor_client" partnerLinkType="client:Gestor" myRole="GestorProvider"/>
+    <partnerLink name="empleado_client" partnerLinkType="ns1:Empleado" partnerRole="EmpleadoProvider"/>
+    <partnerLink name="iberia_client" partnerLinkType="ns2:Iberia" partnerRole="IberiaProvider"/>
+    <partnerLink name="vueling_client" partnerLinkType="ns3:Vueling" partnerRole="VuelingProvider"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:GestorRequestMessage"/>
+
+    <!-- Reference to the message that will be returned to the requester-->
+    <variable name="outputVariable" messageType="client:GestorResponseMessage"/>
+    <variable name="InputVariable_empleado" messageType="ns1:EmpleadoRequestMessage"/>
+    <variable name="OutputVariable_empleado" messageType="ns1:EmpleadoResponseMessage"/>
+    <variable name="InputVariable_Iberia" messageType="ns2:IberiaRequestMessage"/>
+    <variable name="OutputVariable_Iberia" messageType="ns2:IberiaResponseMessage"/>
+    <variable name="InputVariable_vueling" messageType="ns3:VuelingRequestMessage"/>
+    <variable name="OutputVariable_vueling" messageType="ns3:VuelingResponseMessage"/>
+  </variables>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in Gestor.wsdl) -->
+    <receive name="receiveInput" partnerLink="gestor_client" portType="client:Gestor" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="Assign1">
+      <copy>
+        <from>5</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Name</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_empleado.payload/ns1:Nombre</to>
+      </copy>
+      <copy>
+        <from>'Pedro'</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Aerolinea</to>
+      </copy>
+    </assign>
+    <invoke name="Invoke1" partnerLink="empleado_client" portType="ns1:Empleado"
+            operation="process" inputVariable="InputVariable_empleado" outputVariable="OutputVariable_empleado"
+            bpelx:invokeAsDetail="no"/>
+    <assign name="InicializoAerolineas">
+      <copy>
+        <from>$OutputVariable_empleado.payload/ns1:TipoBillete</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_Iberia.payload/ns2:TipoBillete</to>
+      </copy>
+      <copy>
+        <from>$OutputVariable_empleado.payload/ns1:TipoBillete</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_vueling.payload/ns3:TipoBillete</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Llegada</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_vueling.payload/ns3:Fin</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Salida</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_vueling.payload/ns3:Inicio</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Origen</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_vueling.payload/ns3:Origen</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Destino</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_vueling.payload/ns3:Destino</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Origen</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_Iberia.payload/ns2:Origen</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Destino</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_Iberia.payload/ns2:Destino</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Salida</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_Iberia.payload/ns2:Inicio</to>
+      </copy>
+      <copy>
+        <from>$inputVariable.payload/client:Llegada</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$InputVariable_Iberia.payload/ns2:Fin</to>
+      </copy>
+    </assign>
+    <flow name="Flow1">
+      <sequence name="Sequence">
+        <invoke name="Invoke2" partnerLink="iberia_client" portType="ns2:Iberia" operation="process"
+                inputVariable="InputVariable_Iberia" outputVariable="OutputVariable_Iberia" bpelx:invokeAsDetail="no"/>
+      </sequence>
+      <sequence name="Sequence1">
+        <invoke name="Invoke3" partnerLink="vueling_client" portType="ns3:Vueling"
+                operation="process" inputVariable="InputVariable_vueling" outputVariable="OutputVariable_vueling"
+                bpelx:invokeAsDetail="no"/>
+      </sequence>
+    </flow>
+    <if name="If1">
+      <condition>$OutputVariable_Iberia.payload/ns2:Precio&lt;$OutputVariable_vueling.payload/ns3:Precio</condition>
+      <assign name="IBERIA">
+        <copy>
+          <from>$OutputVariable_Iberia.payload/ns2:Precio</from>
+          <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+        </copy>
+        <copy>
+          <from>'Iberia'</from>
+          <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Aerolinea</to>
+        </copy>
+      </assign>
+      <else>
+        <assign name="VUELING">
+          <copy>
+            <from>$OutputVariable_vueling.payload/ns3:Precio</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Precio</to>
+          </copy>
+          <copy>
+            <from>'Vueling'</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.payload/client:Aerolinea</to>
+          </copy>
+        </assign>
+      </else>
+    </if>
+    <!-- Generate reply to synchronous request -->
+    <reply name="replyOutput" partnerLink="gestor_client" portType="client:Gestor" operation="process" variable="outputVariable"/>
+  </sequence>
+</process>
